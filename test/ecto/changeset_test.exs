@@ -1317,7 +1317,7 @@ defmodule Ecto.ChangesetTest do
 
     assert changeset.valid?
     assert changeset.errors == []
-    assert validations(changeset) == [title: {:format, ~r/@/}]
+    assert match?([title: {:format, %Regex{source: "@"}}], validations(changeset))
 
     changeset =
       changeset(%{"title" => "foobar"})
@@ -1325,7 +1325,7 @@ defmodule Ecto.ChangesetTest do
 
     refute changeset.valid?
     assert changeset.errors == [title: {"has invalid format", [validation: :format]}]
-    assert validations(changeset) == [title: {:format, ~r/@/}]
+    assert match?([title: {:format, %Regex{source: "@"}}], validations(changeset))
 
     changeset =
       changeset(%{"title" => "foobar"})
@@ -2681,17 +2681,19 @@ defmodule Ecto.ChangesetTest do
         message: "cannot be more than 15 characters"
       )
 
-    assert constraints(changeset) ==
+    assert match?(
              [
                %{
                  type: :check,
                  field: :title,
-                 constraint: ~r/title_must_be_short\d+/,
+                 constraint: %Regex{source: "title_must_be_short\\d+"},
                  match: :exact,
                  error_message: "cannot be more than 15 characters",
                  error_type: :check
                }
-             ]
+             ],
+             constraints(changeset)
+           )
 
     assert_raise ArgumentError, ~r/invalid match type: :invalid/, fn ->
       change(%Post{})
@@ -2769,17 +2771,19 @@ defmodule Ecto.ChangesetTest do
     changeset =
       change(%Post{}) |> unique_constraint(:title, name: ~r/whatever\d+/, message: "is taken")
 
-    assert constraints(changeset) ==
+    assert match?(
              [
                %{
                  type: :unique,
                  field: :title,
-                 constraint: ~r/whatever\d+/,
+                 constraint: %Regex{source: "whatever\\d+"},
                  match: :exact,
                  error_message: "is taken",
                  error_type: :unique
                }
-             ]
+             ],
+             constraints(changeset)
+           )
 
     assert_raise ArgumentError, ~r/invalid match type: :invalid/, fn ->
       change(%Post{})
@@ -2836,17 +2840,19 @@ defmodule Ecto.ChangesetTest do
     changeset =
       change(%Post{}) |> unique_constraint(:permalink, name: ~r/whatever\d+/, message: "is taken")
 
-    assert constraints(changeset) ==
+    assert match?(
              [
                %{
                  type: :unique,
                  field: :permalink,
-                 constraint: ~r/whatever\d+/,
+                 constraint: %Regex{source: "whatever\\d+"},
                  match: :exact,
                  error_message: "is taken",
                  error_type: :unique
                }
-             ]
+             ],
+             constraints(changeset)
+           )
 
     assert_raise ArgumentError, ~r/invalid match type: :invalid/, fn ->
       change(%Post{})
@@ -2979,17 +2985,19 @@ defmodule Ecto.ChangesetTest do
       change(%Comment{})
       |> foreign_key_constraint(:post, name: ~r/whatever\d+/, message: "is not available")
 
-    assert constraints(changeset) ==
+    assert match?(
              [
                %{
                  type: :foreign_key,
                  field: :post,
-                 constraint: ~r/whatever\d+/,
+                 constraint: %Regex{source: "whatever\\d+"},
                  match: :exact,
                  error_message: "is not available",
                  error_type: :foreign
                }
-             ]
+             ],
+             constraints(changeset)
+           )
 
     assert_raise ArgumentError, ~r/invalid match type: :invalid/, fn ->
       change(%Comment{})
@@ -3100,17 +3108,19 @@ defmodule Ecto.ChangesetTest do
       change(%Comment{})
       |> assoc_constraint(:post, name: ~r/whatever\d+/, message: "is not available")
 
-    assert constraints(changeset) ==
+    assert match?(
              [
                %{
                  type: :foreign_key,
                  field: :post,
-                 constraint: ~r/whatever\d+/,
+                 constraint: %Regex{source: "whatever\\d+"},
                  match: :exact,
                  error_message: "is not available",
                  error_type: :assoc
                }
-             ]
+             ],
+             constraints(changeset)
+           )
 
     assert_raise ArgumentError, ~r/invalid match type: :invalid/, fn ->
       change(%Comment{})
@@ -3229,17 +3239,19 @@ defmodule Ecto.ChangesetTest do
       change(%Post{})
       |> no_assoc_constraint(:comments, name: ~r/comments_post_id_fkey\d+/, message: "exists")
 
-    assert constraints(changeset) ==
+    assert match?(
              [
                %{
                  type: :foreign_key,
                  field: :comments,
-                 constraint: ~r/comments_post_id_fkey\d+/,
+                 constraint: %Regex{source: "comments_post_id_fkey\\d+"},
                  match: :exact,
                  error_message: "exists",
                  error_type: :no_assoc
                }
-             ]
+             ],
+             constraints(changeset)
+           )
 
     assert_raise ArgumentError, ~r/invalid match type: :invalid/, fn ->
       change(%Post{})
@@ -3409,17 +3421,19 @@ defmodule Ecto.ChangesetTest do
       change(%Post{})
       |> exclusion_constraint(:title, name: ~r/whatever\d+/, message: "is invalid")
 
-    assert constraints(changeset) ==
+    assert match?(
              [
                %{
                  type: :exclusion,
                  field: :title,
-                 constraint: ~r/whatever\d+/,
+                 constraint: %Regex{source: "whatever\\d+"},
                  match: :exact,
                  error_message: "is invalid",
                  error_type: :exclusion
                }
-             ]
+             ],
+             constraints(changeset)
+           )
 
     assert_raise ArgumentError, ~r/invalid match type: :invalid/, fn ->
       change(%Post{})
