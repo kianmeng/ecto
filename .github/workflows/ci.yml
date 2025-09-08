@@ -19,15 +19,17 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - elixir: "1.18.1"
-            otp: "27.2"
+          - elixir: "1.18.4"
+            otp: "28.0"
             lint: lint
           - elixir: "1.17.3"
-            otp: "27.1"
+            otp: "27.3"
           - elixir: "1.17.3"
-            otp: "25.0.4"
+            otp: "26.2"
+          - elixir: "1.17.3"
+            otp: "25.3"
           - elixir: "1.14.5"
-            otp: "24.3.4.17"
+            otp: "24.3"
 
     steps:
       - name: Checkout
@@ -68,11 +70,13 @@ jobs:
       fail-fast: false
       matrix:
         elixirbase:
-          - "1.17.3-erlang-27.1-alpine-3.17.9"
-          - "1.17.3-erlang-25.0.4-alpine-3.17.9"
-          - "1.14.5-erlang-23.3.4.20-alpine-3.16.9"
+          - "1.18.4-erlang-28.0.2-alpine-3.22.1"
+          - "1.17.3-erlang-27.3.4.2-alpine-3.22.1"
+          - "1.17.3-erlang-26.2.5.14-alpine-3.22.1"
+          - "1.17.3-erlang-25.3.2.21-alpine-3.22.1"
+          - "1.14.5-erlang-24.3.4.17-alpine-3.22.1"
     steps:
       - uses: earthly/actions-setup@v1
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: ecto integration-test under ${{matrix.elixirbase}}
         run: earthly -P --ci --build-arg ELIXIR_BASE=${{matrix.elixirbase}} +integration-test
